@@ -5,7 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2026-09-22
+
+First public launch — the project is now live on GitHub with CI in place.
+
+### Changed
+- Moved `typescript` from `dependencies` to `devDependencies` — it's only needed to build the project (`tsc`), never required at runtime, so every install is now one less (large) package.
+- Added `repository`, `homepage`, and `bugs` fields to `package.json`, and an npm version + license badge to the README, now that the project is public on GitHub.
+- Reworked the npm publish GitHub Actions workflow to use npm Trusted Publishing (OIDC) instead of a stored `NPM_TOKEN` secret, removing the need to manage an expiring token.
+
+## [0.2.0] - 2026-09-21
 
 ### Changed
 - `init --ai` now interactively prompts for `GEMINI_API_KEY` (input masked) when it isn't already set in the environment, instead of just failing — only in an interactive terminal; falls back to the original fail-closed error in non-interactive contexts (CI, scripts). `run --ai-edge-cases`/`--ai-summarize` are unaffected and still fail closed silently.

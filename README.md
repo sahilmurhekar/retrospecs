@@ -1,5 +1,8 @@
 # retrospecs
 
+[![npm version](https://img.shields.io/npm/v/@retrox/retrospecs.svg)](https://www.npmjs.com/package/@retrox/retrospecs)
+[![license](https://img.shields.io/npm/l/@retrox/retrospecs.svg)](./LICENSE)
+
 Fuzz-test your localhost API endpoints automatically — no more manually clicking through Postman requests.
 
 ## What it does
@@ -26,7 +29,7 @@ npx @retrox/retrospecs run <configPath>
 To hack on the source itself, clone the repo instead:
 
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/sahilmurhekar/retrospecs.git
 cd retrospecs
 npm install
 npm run dev -- run <configPath>   # equivalent to `tsx src/cli.ts run <configPath>`
