@@ -5,3 +5,5 @@ fuzz-results/
 test-output-e2e/
 test-output-tmp/
 *.suggested.json
+
+Claude outputs/
