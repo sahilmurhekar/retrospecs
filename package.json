@@ -1,6 +1,6 @@
 {
   "name": "@retrox/retrospecs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fuzz-test your localhost API endpoints automatically.",
   "license": "MIT",
   "type": "module",

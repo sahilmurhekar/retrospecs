@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { configSchema } from "./config/schema.js";
 import { runFuzz } from "./index.js";
 import { setSeed, getCurrentSeed } from "./runner/rng.js";
@@ -97,12 +99,21 @@ async function ensureGeminiApiKey(): Promise<void> {
   );
 }
 
+// Read the version from package.json at runtime rather than hardcoding it
+// here too — this file lives at src/cli.ts in dev and dist/cli.js once
+// built, and package.json is one directory up from both, so the same
+// relative path resolves correctly either way. Avoids the two copies
+// silently drifting out of sync on every version bump.
+const pkg = JSON.parse(
+  fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "../package.json"), "utf-8")
+) as { version: string };
+
 const program = new Command();
 
 program
   .name("retrospecs")
   .description("Fuzz-test your localhost API endpoints automatically.")
-  .version("0.1.0");
+  .version(pkg.version);
 
 program
   .command("run")
