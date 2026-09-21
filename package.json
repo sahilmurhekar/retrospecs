@@ -1,0 +1,49 @@
+{
+  "name": "@retrox/retrospecs",
+  "version": "0.1.0",
+  "description": "Fuzz-test your localhost API endpoints automatically.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsx src/cli.ts",
+    "sample-server": "tsx examples/sample-server.ts",
+    "prepublishOnly": "npm run build",
+    "postbuild": "chmod +x dist/cli.js"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^26.6.2",
+    "@types/seedrandom": "^3.0.8",
+    "express": "^5.2.1",
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "commander": "^15.0.0",
+    "js-yaml": "^5.4.2",
+    "seedrandom": "^3.0.5",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.5"
+  },
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "retrospecs": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

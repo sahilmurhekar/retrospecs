@@ -1,0 +1,24 @@
+{
+  "baseUrl": "http://localhost:4000",
+  "endpoints": [
+    {
+      "name": "getUser",
+      "method": "GET",
+      "path": "/users",
+      "params": {
+        "id": { "type": "number", "min": 1, "max": 9999 }
+      },
+      "testCount": 200
+    },
+    {
+      "name": "searchProducts",
+      "method": "GET",
+      "path": "/products",
+      "params": {
+        "page": { "type": "number", "min": 1, "max": 20 },
+        "limit": { "type": "number", "min": 1, "max": 100 }
+      },
+      "testCount": 200
+    }
+  ]
+}
