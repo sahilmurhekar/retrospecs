@@ -15,7 +15,13 @@ AI (Gemini Flash) is optional and only ever touches config-authoring and post-ru
 
 ## Example output
 
-Run with `--html-report` and you get a self-contained report per endpoint — here it caught a real bug (a demo endpoint silently accepting out-of-range values it should have rejected):
+```bash
+retrospecs run demo.config.json --html-report --seed launch-demo
+```
+
+![retrospecs running in a terminal](./docs/assets/terminal-demo.gif)
+
+`--html-report` writes a self-contained report per endpoint — here it caught a real bug (a demo endpoint silently accepting out-of-range values it should have rejected):
 
 ![retrospecs HTML report showing two caught failures](./docs/assets/report-screenshot.png)
 
