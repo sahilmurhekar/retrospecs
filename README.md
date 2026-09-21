@@ -13,6 +13,12 @@ Fuzz-test your localhost API endpoints automatically — no more manually clicki
 
 AI (Gemini Flash) is optional and only ever touches config-authoring and post-run summarization — never the test-execution loop itself. `run --ai-edge-cases`/`--ai-summarize` fail closed with no API key (skipped, never crashing the run). `init --ai` is different: it requires a key to do its job, so it interactively prompts you for one (input masked) if `GEMINI_API_KEY` isn't already set, rather than just failing.
 
+## Example output
+
+Run with `--html-report` and you get a self-contained report per endpoint — here it caught a real bug (a demo endpoint silently accepting out-of-range values it should have rejected):
+
+![retrospecs HTML report showing two caught failures](./docs/assets/report-screenshot.png)
+
 ## Install
 
 ```bash
