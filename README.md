@@ -8,23 +8,28 @@ Fuzz-test your localhost API endpoints automatically — no more manually clicki
 
 **Safety guarantee:** requests only ever go to `127.0.0.1` / `::1` / `localhost`. The target hostname is DNS-resolved (not string-matched) before every run, and anything that doesn't resolve to loopback is refused outright. Mutating methods (`POST`/`PUT`/`PATCH`/`DELETE`) are opt-in only — an endpoint must explicitly set `allowMutations: true` and provide a `cleanup` step, or the config fails validation before anything runs.
 
-AI (Gemini Flash) is optional and only ever touches config-authoring and post-run summarization — never the test-execution loop itself. With no API key configured, every AI-assisted flag fails closed and the rest of the tool works exactly as if it weren't there.
+AI (Gemini Flash) is optional and only ever touches config-authoring and post-run summarization — never the test-execution loop itself. `run --ai-edge-cases`/`--ai-summarize` fail closed with no API key (skipped, never crashing the run). `init --ai` is different: it requires a key to do its job, so it interactively prompts you for one (input masked) if `GEMINI_API_KEY` isn't already set, rather than just failing.
 
 ## Install
 
-Not published yet. For now, run it from a clone of this repo:
+```bash
+npm install -g @retrox/retrospecs
+retrospecs run <configPath>
+```
+
+or without installing globally:
+
+```bash
+npx @retrox/retrospecs run <configPath>
+```
+
+To hack on the source itself, clone the repo instead:
 
 ```bash
 git clone <this-repo-url>
 cd retrospecs
 npm install
 npm run dev -- run <configPath>   # equivalent to `tsx src/cli.ts run <configPath>`
-```
-
-Once published, this will be:
-
-```bash
-npx retrospecs run <configPath>
 ```
 
 ## Quick start
@@ -106,7 +111,10 @@ See [`docs/config-reference.md`](docs/config-reference.md) for the full field-by
 
 ## AI-assisted features
 
-`--ai-edge-cases`, `--ai-summarize`, and `init --ai` all call Gemini Flash and require an API key to be configured. Without one, these flags fail closed — they're skipped rather than crashing the run, and the deterministic core works fully offline with zero API keys either way.
+`--ai-edge-cases`, `--ai-summarize`, and `init --ai` all call Gemini Flash and require an API key to be configured — set `GEMINI_API_KEY` in your environment to skip the prompt below. The deterministic core (`run` without any AI flags) works fully offline with zero API keys, always.
+
+- `run --ai-edge-cases` / `run --ai-summarize`: fail closed with no key. The step is skipped and the rest of the run proceeds normally — a missing key never crashes a fuzz run.
+- `init --ai`: requires a key to do its one job (drafting a config), so if `GEMINI_API_KEY` isn't set and you're in an interactive terminal, it prompts you for one on the spot (input masked with `*`) and uses it for that run. Get a free key at https://aistudio.google.com/apikey. In a non-interactive context (CI, a script), there's no one to prompt, so it fails closed with the same clear error instead.
 
 ## License
 

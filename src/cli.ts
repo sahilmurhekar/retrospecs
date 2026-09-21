@@ -10,6 +10,93 @@ import { generateConfigFromSpec } from "./ai-assist/generateConfigFromSpec.js";
 import { summarizeFailures } from "./ai-assist/summarizeFailures.js";
 import { AiAssistDisabledError } from "./ai-assist/client.js";
 
+// Interactively prompts for a secret value, masking each typed character
+// with "*" so the key never lingers in terminal scrollback or a screen
+// recording. Only works against a real TTY — callers must check
+// process.stdin.isTTY first, since there's nothing to prompt in a
+// non-interactive context (CI, piped input, etc.).
+function promptForSecret(question: string): Promise<string> {
+  return new Promise((resolve) => {
+    const stdin = process.stdin;
+    const stdout = process.stdout;
+
+    stdout.write(question);
+    stdin.resume();
+    stdin.setEncoding("utf8");
+    stdin.setRawMode(true);
+
+    let input = "";
+    let done = false;
+    // Raw-mode stdin can deliver several typed (or pasted) characters in a
+    // single "data" event, not one byte per event — so each chunk is walked
+    // character by character rather than treated as a single unit. Without
+    // this, a paste of the whole key would only print one "*" total instead
+    // of one per character.
+    const onData = (chunk: string) => {
+      if (done) return;
+      const str = chunk.toString();
+      for (const char of str) {
+        switch (char) {
+          case "\n":
+          case "\r":
+          case "\u0004": // Ctrl-D
+            done = true;
+            stdin.setRawMode(false);
+            stdin.pause();
+            stdin.removeListener("data", onData);
+            stdout.write("\n");
+            resolve(input.trim());
+            return;
+          case "\u0003": // Ctrl-C
+            stdout.write("\n");
+            process.exit(1);
+            break;
+          case "\u007f": // backspace
+          case "\b":
+            if (input.length > 0) {
+              input = input.slice(0, -1);
+              stdout.write("\b \b");
+            }
+            break;
+          default:
+            input += char;
+            stdout.write("*");
+            break;
+        }
+      }
+    };
+
+    stdin.on("data", onData);
+  });
+}
+
+// AI-assist config drafting is mandatory once --ai is chosen — rather than
+// failing when GEMINI_API_KEY isn't set, prompt for it right here so the
+// command still completes in one shot. Only usable interactively; in a
+// non-TTY context (CI, scripts) there's no one to prompt, so this falls
+// through and the caller's own error path handles it.
+async function ensureGeminiApiKey(): Promise<void> {
+  if (process.env.GEMINI_API_KEY) return;
+  if (!process.stdin.isTTY) return;
+
+  console.log("No GEMINI_API_KEY found in your environment.");
+  const key = await promptForSecret(
+    "Enter your Gemini API key (get one free at https://aistudio.google.com/apikey): "
+  );
+
+  if (!key) {
+    throw new AiAssistDisabledError(
+      "No Gemini API key entered — AI-assist config drafting cannot continue."
+    );
+  }
+
+  process.env.GEMINI_API_KEY = key;
+  console.log(
+    "Using that key for this run. To skip this prompt next time, set it as an environment " +
+    "variable: export GEMINI_API_KEY=your-key-here\n"
+  );
+}
+
 const program = new Command();
 
 program
@@ -115,6 +202,7 @@ program
         if (!opts.describe) {
           throw new Error("--ai requires --describe \"...\" to explain what to generate a config for");
         }
+        await ensureGeminiApiKey();
         console.log("Asking Gemini to draft a config...");
         config = await generateConfigFromSpec({
           description: opts.describe,

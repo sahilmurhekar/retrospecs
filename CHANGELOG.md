@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- `init --ai` now interactively prompts for `GEMINI_API_KEY` (input masked) when it isn't already set in the environment, instead of just failing — only in an interactive terminal; falls back to the original fail-closed error in non-interactive contexts (CI, scripts). `run --ai-edge-cases`/`--ai-summarize` are unaffected and still fail closed silently.
+
+## [0.1.0] - 2026-09-21
+
+Initial public release, published to npm as `@retrox/retrospecs`.
+
 ### Added
 - Core fuzzing engine: localhost-only guard (DNS-resolved, refuses anything non-loopback), seeded PRNG for reproducible runs
 - Generators for string / number / boolean params (boundary, random-valid, wrong-type, missing, extreme cases)
@@ -22,5 +29,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JSON reporter: `results.json` (every case) and `summary.json` (pass/fail counts, `byOutcome` breakdown, `unexpectedFailures`)
 - HTML reporter (`--html-report` flag): a self-contained `report.html` per endpoint as a visual alternative to the JSON output
 - README, config file reference doc, and MIT license
-
-<!-- At publish time: rename [Unreleased] above to [0.1.0] - <release date>, then start a fresh empty [Unreleased] section above it. -->
